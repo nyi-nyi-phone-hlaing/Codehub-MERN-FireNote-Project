@@ -10,13 +10,20 @@ import toastConfig from "../utils/toastConfig";
 const Main = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [notes, setNotes] = useState([]);
+
   const getNotes = async () => {
     try {
       setLoading(true);
       const response = await fetch(
         "https://firenote-mern-project-default-rtdb.firebaseio.com/notes.json"
       );
+
+      if (!response.ok) {
+        throw new Error("Cannot connect with firebase. Try again.");
+      }
+
       const notes = await response.json();
       const modifiedNotes = [];
       for (const key in notes) {
@@ -26,6 +33,7 @@ const Main = () => {
       setLoading(false);
       setNotes(modifiedNotes);
     } catch (error) {
+      setError(error.message);
       toast.error("Something went wrong! Refresh again.", toastConfig);
     }
   };
@@ -44,9 +52,24 @@ const Main = () => {
 
   return (
     <section className='relative bg-neutral-100 w-1/2 h-screen'>
-      <Navbar openInputHandler={openInputHandler} getNotes={getNotes} />
-      <InputContainer closeInputHandler={closeInputHandler} isOpen={isOpen} />
-      <NoteContainer notes={notes} loading={loading} />
+      <Navbar
+        openInputHandler={openInputHandler}
+        error={error}
+        total={notes.length}
+      />
+      <InputContainer
+        closeInputHandler={closeInputHandler}
+        isOpen={isOpen}
+        getNotes={getNotes}
+      />
+      {!error ? (
+        <NoteContainer notes={notes} loading={loading} getNotes={getNotes} />
+      ) : (
+        <>
+          <p>{error}</p>
+        </>
+      )}
+
       <DetailContainer />
       <ToastContainer />
     </section>

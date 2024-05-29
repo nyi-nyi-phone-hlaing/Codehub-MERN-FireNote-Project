@@ -4,7 +4,7 @@ import { GoPlus } from "react-icons/go";
 import { toast } from "react-toastify";
 import toastConfig from "../utils/toastConfig";
 
-const InputForm = ({ closeInputHandler }) => {
+const InputForm = ({ closeInputHandler, getNotes }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const addNote = async (e) => {
@@ -29,6 +29,7 @@ const InputForm = ({ closeInputHandler }) => {
       setTitle("");
       setContent("");
       closeInputHandler();
+      getNotes();
       toast.success("Note add successfully.", toastConfig);
     } catch (error) {
       toast.error("Something went wrong! Try again.", toastConfig);
@@ -71,6 +72,7 @@ const InputForm = ({ closeInputHandler }) => {
 
 InputForm.propTypes = {
   closeInputHandler: PropTypes.func,
+  getNotes: PropTypes.func,
 };
 
 export default InputForm;
