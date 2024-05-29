@@ -1,8 +1,41 @@
+import { useState } from "react";
+import PropTypes from "prop-types";
 import { GoPlus } from "react-icons/go";
+import { toast } from "react-toastify";
+import toastConfig from "../utils/toastConfig";
 
-const InputForm = () => {
+const InputForm = ({ closeInputHandler }) => {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const addNote = async (e) => {
+    e.preventDefault();
+
+    if (title.trim() === "" || content.trim() === "")
+      return toast.error("Title or Content are invalid", toastConfig);
+    try {
+      await fetch(
+        "https://firenote-mern-project-default-rtdb.firebaseio.com/notes.json",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            title,
+            content,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setTitle("");
+      setContent("");
+      closeInputHandler();
+      toast.success("Note add successfully.", toastConfig);
+    } catch (error) {
+      toast.error("Something went wrong! Try again.", toastConfig);
+    }
+  };
   return (
-    <form className='w-full h-[calc(100%-3rem)] p-4'>
+    <form onSubmit={addNote} className='w-full h-[calc(100%-3rem)] p-4'>
       <div className='w-full flex flex-col mb-2 '>
         <label htmlFor='title' className='text-gray-600 text-base mb-1'>
           Title
@@ -10,6 +43,8 @@ const InputForm = () => {
         <input
           type='text'
           name='title'
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
           className='bg-blue-50 py-1 px-2 font-thin text-base outline-none border-2 border-slate-500 rounded-md focus:border-blue-500'
         />
       </div>
@@ -19,6 +54,8 @@ const InputForm = () => {
         </label>
         <textarea
           name='content'
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
           rows={6}
           className='bg-blue-50 py-1 px-2 font-thin text-base outline-none border-2 border-slate-500 resize-none rounded-md focus:border-blue-500'></textarea>
       </div>
@@ -30,6 +67,10 @@ const InputForm = () => {
       </button>
     </form>
   );
+};
+
+InputForm.propTypes = {
+  closeInputHandler: PropTypes.func,
 };
 
 export default InputForm;

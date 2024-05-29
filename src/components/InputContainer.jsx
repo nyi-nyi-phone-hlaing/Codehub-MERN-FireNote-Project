@@ -19,7 +19,7 @@ const InputContainer = ({ closeInputHandler, isOpen }) => {
             <GoX />
           </button>
         </header>
-        <InputForm />
+        <InputForm closeInputHandler={closeInputHandler} />
       </div>
     </section>
   );
